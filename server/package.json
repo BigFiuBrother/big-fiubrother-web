@@ -1,0 +1,16 @@
+{
+  "name": "big-fiubrother-web-server",
+  "version": "0.0.1",
+  "description": "Big Fiubrother Web Server",
+  "main": "app.js",
+  "repository": "https://github.com/BigFiuBrother/big-fiubrother-web.git",
+  "author": "Eduardo Neira <edun327@gmail.com>",
+  "license": "GPL-3.0",
+  "private": false,
+  "dependencies": {
+    "http": "^0.0.0",
+    "jsonwebtoken": "^8.5.0",
+    "koa": "^2.7.0",
+    "socket.io": "^2.2.0"
+  }
+}
