@@ -1,0 +1,16 @@
+{
+  "name": "big-fiubrother-web",
+  "version": "0.0.1",
+  "description": "Big fiubrother web server and client",
+  "main": "server.js",
+  "repository": "https://github.com/BigFiuBrother/big-fiubrother-web.git",
+  "author": "Eduardo Neira <aneira@fi.uba.ar>",
+  "license": "GPLv3",
+  "private": false,
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
