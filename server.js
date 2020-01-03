@@ -5,7 +5,7 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var fs = require('fs');
 
-// const PriorityQueue = require('./src/priority_queue')
+// const PriorityQueue = require('./public/priority_queue')
 // var queue = new PriorityQueue
 app.use(express.static('public'));
 
