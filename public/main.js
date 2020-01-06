@@ -1,5 +1,3 @@
-const PriorityQueue = require('./priority_queue')
-
 var mime = 'video/mp4; codecs="avc1.64001F"';
 var mediaSource = new MediaSource();
 
