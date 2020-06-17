@@ -1,42 +1,50 @@
-var mime = 'video/mp4; codecs="avc1.64001F"';
-var mediaSource = new MediaSource();
+var mime = 'video/mp4; codecs="avc1.640028"'
+var mediaSource = new MediaSource()
 
-var player = document.getElementById('video-player');
-player.src = URL.createObjectURL(mediaSource);
+var video = document.getElementById('video-player')
+video.src = URL.createObjectURL(mediaSource)
 
-var socket = io.connect('http://localhost:8080/video', { 'forceNew': true });
+var socket = io.connect('http://localhost:8080/video', { forceNew: true })
 
-mediaSource.addEventListener('sourceopen', function(e) {
-  URL.revokeObjectURL(player.src);
-  
-  var mediaSource = e.target;
+mediaSource.addEventListener('sourceopen', function (e) {
+  // URL.revokeObjectURL(video.src);
+
+  var mediaSource = e.target
   mediaSource.duration = Number.POSITIVE_INFINITY
-  
-  var sourceBuffer = mediaSource.addSourceBuffer(mime);
 
-  var queue = new PriorityQueue(function (a,b) {
-    return a.timestamp > b.timestamp;
-  });
+  var sourceBuffer = mediaSource.addSourceBuffer(mime)
+  sourceBuffer.mode = 'sequence'
 
-  sourceBuffer.addEventListener('updateend', function(e) {
+  var lastTimestamp = 0
+
+  var queue = new PriorityQueue(function (a, b) {
+    return a.timestamp > b.timestamp
+  })
+
+  function appendBuffer (buffer, data) {
+    if (data.timestamp > lastTimestamp) {
+      buffer.appendBuffer(data.payload)
+      lastTimestamp = data.timestamp
+    }
+  }
+
+  sourceBuffer.addEventListener('updateend', function (e) {
     if (!sourceBuffer.updating && !queue.isEmpty()) {
-      var buffer = queue.pop().payload;
-      sourceBuffer.appendBuffer(buffer);
+      var data = queue.pop()
+      appendBuffer(sourceBuffer, data)
     }
-  });
+  })
 
-  sourceBuffer.addEventListener('error', function(e) {
-    console.log(e);
-  });
+  sourceBuffer.addEventListener('error', function (e) {
+    console.log(e)
+  })
 
-  socket.on('feed', function(data) {
+  socket.on('feed', function (data) {
+    console.log(`Feed received! timestamp: ${data.timestamp}`)
     if (sourceBuffer.updating) {
-      queue.push(data);
+      queue.push(data)
     } else {
-      sourceBuffer.appendBuffer(data.payload);
+      appendBuffer(sourceBuffer, data)
     }
-  });
-});
-
-
-
+  })
+})
