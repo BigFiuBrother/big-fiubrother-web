@@ -1,4 +1,4 @@
-var mime = 'video/mp4; codecs="avc1.640028"'
+var mime = 'video/mp4; codecs="avc1.f4001f"'
 var mediaSource = new MediaSource()
 
 var video = document.getElementById('video-player')
