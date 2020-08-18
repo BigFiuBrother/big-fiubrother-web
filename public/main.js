@@ -25,6 +25,10 @@ mediaSource.addEventListener('sourceopen', function (e) {
     if (data.timestamp > lastTimestamp) {
       buffer.appendBuffer(data.payload)
       lastTimestamp = data.timestamp
+      
+      if (video.paused) {
+        video.play()
+      }
     }
   }
 

@@ -3,7 +3,8 @@ var app = express()
 var bodyParser = require('body-parser')
 var server = require('http').Server(app)
 var io = require('socket.io')(server)
-var fs = require('fs')
+
+var fetch_video = require('./src/fetch_video')
 
 app.use(express.static('public'))
 
@@ -15,17 +16,13 @@ io.of('/video').on('connection', function () {
 })
 
 app.post('/video', (req, res) => {
-  fs.readFile(req.body.filepath, function (err, data) {
-    if (err) {
-      throw err
-    }
+  fetch_video(req.body.video_chunk_id, function(data) {
+      console.log('Sending chunk!')
 
-    console.log('Sending chunk!')
-
-    io.of('/video').emit('feed', {
-      timestamp: req.body.timestamp,
-      payload: data
-    })
+      io.of('/video').emit('feed', {
+        timestamp: req.body.timestamp,
+        payload: data
+      })
   })
 
   res.status(200).send('OK')
