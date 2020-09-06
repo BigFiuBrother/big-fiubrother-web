@@ -24,7 +24,8 @@ app.post('/video', (req, res) => {
 
       io.of('/video').emit('feed', {
         timestamp: req.body.timestamp,
-        payload: data
+        payload: data,
+        duration: req.body.duration
       })
   })
 
