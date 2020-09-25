@@ -1,104 +1,49 @@
-function formatDate(date) {
-    // Hours part from the timestamp
-    var hours = date.getHours();
-    // Minutes part from the timestamp
-    var minutes = "0" + date.getMinutes();
-    // Seconds part from the timestamp
-    var seconds = "0" + date.getSeconds();
+var socketClient = new SocketClient();
+var videoIndex = new VideoIndex();
+socketClient.onBoxes(videoIndex.addBoxes);
 
-    // Will display time in 10:30:23 format
-    return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
-}
+var videoCanvas = new VideoCanvas(videoIndex);
 
-function debugTime(timestamp) {
-    var timestampDate = new Date(Math.floor(timestamp * 1000));
+var mime = 'video/mp4; codecs="avc1.f4001f"';
+var mediaSource = new MediaSource();
 
-    console.log(`Feed time: ${formatDate(timestampDate)} - Current time: ${formatDate(new Date())}`)
+var video = document.getElementById('video');
+video.src = URL.createObjectURL(mediaSource);
 
-    var video = document.getElementById('video-player')
-    console.log(`Video time: ${video.currentTime}`)
-}
+mediaSource.addEventListener('sourceopen', (e) => {
+  var mediaSource = e.target;
+  mediaSource.duration = Number.POSITIVE_INFINITY;
 
-var mime = 'video/mp4; codecs="avc1.f4001f"'
-var mediaSource = new MediaSource()
+  var sourceBuffer = mediaSource.addSourceBuffer(mime);
+  var videoBuffer = new VideoBuffer(sourceBuffer, videoIndex);
 
-var video = document.getElementById('video-player')
-video.src = URL.createObjectURL(mediaSource)
+  var hasSwitchedTabs = false;
 
-var socket = io.connect('http://localhost:8080/video', { forceNew: true })
+  function resume() {
+    if (video.paused) {
+      video.play();
+    }
+  }
 
-mediaSource.addEventListener('sourceopen', function (e) {
-  var mediaSource = e.target
-  mediaSource.duration = Number.POSITIVE_INFINITY
+  window.onblur = () => {
+    hasSwitchedTabs = true;
+  }
 
-  var sourceBuffer = mediaSource.addSourceBuffer(mime)
-  sourceBuffer.mode = 'sequence'
-
-  var lastTimestamp = 0
-  var playTime = 0
-  var firstChunkDuration = 0
-
-  var hasSwitchedTabs = false
-
-  // Set when tab is inactive
-  window.onfocus = function () { 
+  window.onfocus = () => { 
     if (hasSwitchedTabs) {
       hasSwitchedTabs = false
-      //console.log(`Tabs switched! Changing video time to: ${playTime}`)
-      video.currentTime = playTime
-      
-      if (video.paused) {
-        video.play()
-      }
-    }
-  };
-
-  window.onblur = function() {
-    hasSwitchedTabs = true
-  }
-
-  var queue = new PriorityQueue(function (a, b) {
-    return a.timestamp > b.timestamp
-  })
-
-  function appendBuffer (buffer, data) {
-    if (data.timestamp > lastTimestamp) {
-      console.log(`Appending buffer ${data.timestamp}`)
-      buffer.appendBuffer(data.payload)
-      lastTimestamp = data.timestamp
-      
-      if (video.paused) {
-        video.play()
-      }
+      var lastChunk = videoBuffer.lastChunk();
+      video.currentTime = videoBuffer.timeAppended() - lastChunk.duration;
+      videoCanvas.updateToChunk(videoIndex.id);
+      resume();
     }
   }
 
-  sourceBuffer.addEventListener('updateend', function (e) {
-    if (!sourceBuffer.updating && !queue.isEmpty()) {
-      var data = queue.pop()
-      appendBuffer(sourceBuffer, data)
+  socketClient.onChunk((chunk) => {
+    if (videoBuffer.appendChunk(chunk)) {
+      resume();
     }
-  })
-
-  sourceBuffer.addEventListener('error', function (e) {
-    console.log(e)
-  })
-
-  socket.on('feed', function (data) {
-    if (sourceBuffer.updating || firstChunkDuration == 0) {
-      if (firstChunkDuration == 0) {
-        firstChunkDuration = data.duration
-      }
-      queue.push(data)
-    } else {
-      appendBuffer(sourceBuffer, data)
-    }
-
-    setTimeout(function() {
-      var expected = playTime + data.duration
-      var actual = video.currentTime + firstChunkDuration
-      console.log(`Difference time: ${expected - actual}`)
-      playTime = expected
-    }, data.duration * 1000)
   })
 })
+
+

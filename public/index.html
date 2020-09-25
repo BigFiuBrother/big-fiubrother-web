@@ -3,9 +3,15 @@
     <title>Big Fiubrother</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="priority_queue.min.js"></script>
+    <script src="socket_client.js"></script>
+    <script src="chunk_boxes.js"></script>
+    <script src="video_index.js"></script>
+    <script src="video_canvas.js"></script>
+    <script src="video_buffer.js"></script>
   </head>
   <body>
-    <video muted autoplay id="video-player"></video>
+    <video muted autoplay hidden id="auxiliar-video"></video>
+    <canvas id="video-canvas"></canvas>
     <script src="main.js"></script>
   </body>
 </html>

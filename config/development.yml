@@ -1,0 +1,12 @@
+storage:
+  endPoint: 'localhost'
+  port: 9500
+  useSSL: false
+  accessKey: 'fiubrother'
+  secretKey: 'alwayswatching'
+logger:
+  host: 'localhost'
+  port: 12201
+server:
+  port: 8080
+  stageTime: 5
