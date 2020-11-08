@@ -5,7 +5,6 @@ class VideoIndex {
 
     this.frameOffset = 0;
     this.frameBST = [];
-    
 
     this.estimatedFrameBSTPointer = 0;
   }
