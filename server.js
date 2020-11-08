@@ -1,4 +1,4 @@
-var server = require('./app/server')
+var server = require('./app')
 var configuration = require('./app/configuration')
 
 

@@ -17,6 +17,7 @@
     "graylog2": "^0.2.1",
     "js-yaml": "^3.14.0",
     "minio": "^7.0.16",
+    "pg": "^8.3.3",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {

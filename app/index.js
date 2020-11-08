@@ -1,40 +1,37 @@
-var express = require('express')
-var bodyParser = require('body-parser')
-var http = require('http')
+const express = require('express')
+const bodyParser = require('body-parser')
+const http = require('http')
 
 const SocketServer = require('./socket_server')
-const Chunk = require('./chunk')
-
+const VideoChunk = require('./video_chunk')
+const VideoAnalysis = require('./video_analysis')
 
 // Create app and server
-var app = express()
-var server = http.Server(app)
+const app = express()
+const server = http.Server(app)
 
 // Expose public
 app.use(express.static('public'))
 
-// Use body parser 
+// Use body parser
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 // Create SocketServer
-var socketServer = new SocketServer(server)
+const socketServer = new SocketServer(server)
 
 // Video endpoint
-app.post('/video', (req, res) => {
-  var chunk = new Chunk(req.body)
-
-  socketServer.sendChunk(chunk)
+app.post('/video/chunk', (req, res) => {
+  socketServer.sendChunk(new VideoChunk(req.body))
 
   res.status(200).send('OK')
 })
 
-// Boxes endpoint
-app.post('/boxes', (req, res) => {
-  socketServer.sendBoxes(req.body)
+// Analysis endpoint
+app.post('/video/analysis', (req, res) => {
+  socketServer.sendAnalysis(new VideoAnalysis(req.body))
 
   res.status(200).send('OK')
 })
-
 
 module.exports = server

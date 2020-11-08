@@ -10,3 +10,9 @@ logger:
 server:
   port: 8080
   stageTime: 5
+db:
+  user: 'fiubrother'
+  host: 'localhost'
+  database: 'big_fiubrother'
+  password: 'alwayswatching'
+  port: 5432
