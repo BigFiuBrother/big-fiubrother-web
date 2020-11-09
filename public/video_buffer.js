@@ -1,69 +1,77 @@
-class VideoBuffer {
-  constructor(sourceBuffer, videoIndex) {
-    this.sourceBuffer = sourceBuffer;
-    this.sourceBuffer.mode = 'sequence';
+import { PriorityQueue } from './priority_queue.min'
 
-    this.videoIndex = videoIndex;
+export class VideoBuffer {
+  constructor (sourceBuffer, videoIndex) {
+    this.sourceBuffer = sourceBuffer
+    this.sourceBuffer.mode = 'sequence'
 
-    this.timeAppended = 0;
-    this.preBuffering = 0;
-    this.lastTimestamp = 0;
-    this.lastChunk = 0;
+    this.videoIndex = videoIndex
+
+    this.timeAppended = 0
+    this.preBuffering = 0
+    this.lastTimestamp = 0
+    this.lastChunk = null
 
     this.queue = new PriorityQueue(function (a, b) {
-      return a.timestamp > b.timestamp;
+      return a.timestamp > b.timestamp
     })
 
+    // Rename this to use inside callbacks
+    const self = this
+
     this.sourceBuffer.addEventListener('updateend', function (e) {
-      if (!this.needsToPreBuffer()) {
-        this.appendToBuffer(chunk);
+      if (!self.needsToPreBuffer()) {
+        self.appendToBuffer()
       }
     })
 
     this.sourceBuffer.addEventListener('error', function (e) {
-      console.log(e);
+      console.log(e)
     })
   }
 
   // Needs to prebuffer if time in queue is less than 5 seconds
-  needsToPreBuffer() {
-    return this.preBuffering < 5.0;
+  needsToPreBuffer () {
+    return this.preBuffering < 5.0
   }
 
-  timeAppended() {
-    return this.timeAppended;
+  getTimeAppended () {
+    return this.timeAppended
   }
 
-  lastChunk() {
-    return this.lastChunk;
+  getLastChunk () {
+    return this.lastChunk
   }
 
-  appendToBuffer() {
-    var chunk;
+  appendToBuffer () {
+    let chunk
 
     do {
-      chunk = this.queue.pop();
-      this.preBuffering -= chunk.duration;
-    } while (chunk.timestamp < this.lastTimestamp and !this.queue.isEmpty())
+      chunk = this.queue.pop()
+      this.preBuffering -= chunk.duration
+      // Remove chunks that have a timestamp before the last appended until queue is emptied
+    } while (chunk.timestamp < this.lastTimestamp && !this.queue.isEmpty())
 
-    this.lastTimestamp = chunk.timestamp;
-    this.timeAppended += chunk.duration;
-    this.lastChunk = chunk;
-    this.videoIndex.addVideoChunk(chunk);
-    this.sourceBuffer.appendBuffer(chunk.payload);
+    if (chunk.timestamp > this.lastTimestamp) {
+      this.lastTimestamp = chunk.timestamp
+      this.timeAppended += chunk.duration
+      this.lastChunk = chunk
+      this.videoIndex.addVideoChunk(chunk)
+      this.sourceBuffer.appendBuffer(chunk.payload)
+    }
   }
 
-  appendChunk(chunk) {
-    var appended = false;
+  preBufferChunk (chunk) {
+    let appended = false
 
-    this.preBuffering += chunk.duration;
-    this.queue.push(chunk);
-    
+    this.preBuffering += chunk.duration
+    this.queue.push(chunk)
+
     if (!this.sourceBuffer.updating && !this.needsToPreBuffer()) {
-      this.appendToBuffer();
-      appended = true;
+      this.appendToBuffer()
+      appended = true
     }
 
-    return appended;
+    return appended
   }
 }

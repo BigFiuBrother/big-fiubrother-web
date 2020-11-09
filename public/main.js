@@ -1,49 +1,54 @@
-var socketClient = new SocketClient();
-var videoIndex = new VideoIndex();
-socketClient.onBoxes(videoIndex.addBoxes);
+import { SocketClient } from './socket_client'
+import { VideoIndex } from './video_index'
+import { VideoCanvas } from './video_canvas'
+import { VideoBuffer } from './video_buffer'
 
-var videoCanvas = new VideoCanvas(videoIndex);
+const socketClient = new SocketClient()
+const videoIndex = new VideoIndex()
+socketClient.onAnalysis(videoIndex.addAnalysis)
 
-var mime = 'video/mp4; codecs="avc1.f4001f"';
-var mediaSource = new MediaSource();
+const videoCanvas = new VideoCanvas(videoIndex)
 
-var video = document.getElementById('video');
-video.src = URL.createObjectURL(mediaSource);
+const mime = 'video/mp4; codecs="avc1.f4001f"'
+// eslint-disable-next-line no-undef
+const mediaSource = new MediaSource()
+
+const video = document.getElementById('video')
+video.src = URL.createObjectURL(mediaSource)
 
 mediaSource.addEventListener('sourceopen', (e) => {
-  var mediaSource = e.target;
-  mediaSource.duration = Number.POSITIVE_INFINITY;
+  const mediaSource = e.target
+  // Set duration for infinite stream
+  mediaSource.duration = Number.POSITIVE_INFINITY
 
-  var sourceBuffer = mediaSource.addSourceBuffer(mime);
-  var videoBuffer = new VideoBuffer(sourceBuffer, videoIndex);
+  const sourceBuffer = mediaSource.addSourceBuffer(mime)
+  const videoBuffer = new VideoBuffer(sourceBuffer, videoIndex)
 
-  var hasSwitchedTabs = false;
+  let hasSwitchedTabs = false
 
-  function resume() {
+  function resume () {
     if (video.paused) {
-      video.play();
+      video.play()
     }
   }
 
   window.onblur = () => {
-    hasSwitchedTabs = true;
+    hasSwitchedTabs = true
   }
 
-  window.onfocus = () => { 
+  window.onfocus = () => {
     if (hasSwitchedTabs) {
       hasSwitchedTabs = false
-      var lastChunk = videoBuffer.lastChunk();
-      video.currentTime = videoBuffer.timeAppended() - lastChunk.duration;
-      videoCanvas.updateToChunk(videoIndex.id);
-      resume();
+      const lastChunk = videoBuffer.getLastChunk()
+      video.currentTime = videoBuffer.getTimeAppended() - lastChunk.duration
+      videoCanvas.updateToChunk(videoIndex.id)
+      resume()
     }
   }
 
   socketClient.onChunk((chunk) => {
-    if (videoBuffer.appendChunk(chunk)) {
-      resume();
+    if (videoBuffer.preBufferChunk(chunk)) {
+      resume()
     }
   })
 })
-
-

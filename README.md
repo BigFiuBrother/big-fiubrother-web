@@ -1,3 +1,3 @@
 # big-fiubrother-web
 
-Big fiubrother web server and client
+Big Fiubrother web server and client

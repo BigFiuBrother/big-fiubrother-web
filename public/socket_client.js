@@ -1,4 +1,4 @@
-import io from 'socket.io-client';
+import io from 'socket.io-client'
 
 export class SocketClient {
   constructor () {
@@ -9,7 +9,7 @@ export class SocketClient {
     this.client.on('chunk', callback)
   }
 
-  onBoxes (callback) {
-    this.client.on('boxes', callback)
+  onAnalysis (callback) {
+    this.client.on('analysis', callback)
   }
 }

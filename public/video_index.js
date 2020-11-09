@@ -1,74 +1,77 @@
-class VideoIndex {
-  constructor() {
-    this.videoChunkIndex = {};
-    this.chunkBoxesIndex = {};
+import { VideoAnalysis } from './video_analysis'
 
-    this.frameOffset = 0;
-    this.frameBST = [];
+export class VideoIndex {
+  constructor () {
+    this.chunkIndex = {}
+    this.analysisIndex = {}
 
-    this.estimatedFrameBSTPointer = 0;
+    this.frameOffset = 0
+    this.chunkBST = []
+
+    this.pointer = 0
   }
 
-  addVideoChunk(chunk) {
-    this.videoChunkIndex[chunk.id] = {frameOffset: this.frameOffset, frameCount: chunk.frameCount};
-    this.frameBST = this.frameBST.push([this.frameOffset, chunk.id]);
-    this.frameOffset += chunk.frameCount;
+  addVideoChunk (chunk) {
+    this.chunkIndex[chunk.id] = { frameOffset: this.frameOffset, frameCount: chunk.frameCount }
+    this.chunkBST = this.chunkBST.push([this.frameOffset, chunk.id])
+    this.frameOffset += chunk.frameCount
   }
 
-  addChunkBoxes(chunkBoxes) {
-    this.chunkBoxesIndex[chunkBoxes.chunkId] = new ChunkBoxes(chunkBoxes);
+  addAnalysis (analysis) {
+    this.analysisIndex[analysis.chunkId] = new VideoAnalysis(analysis)
   }
 
-  getFrameOffset(chunkId) {
-    return this.videoChunkIndex[chunkId].frameOffset;
+  getFrameOffset (chunkId) {
+    return this.chunkIndex[chunkId].frameOffset
   }
 
-  getBoxes(frameOffset) {
+  getBoxes (frameOffset) {
     // Use estimated pointer to avoid BST if possible
-    [chunkOffset, chunkId] = this.frameBST[this.estimatedFrameBSTPointer];
-    var offset = frameOffset - chunkOffset;
-    var frameCount = this.videoChunkIndex[chunkId].frameCount;
+    const result = this.getBoxesFromChunkBST(frameOffset, this.pointer)
 
-    if (offset >= 0 && offset < frameCount) {
-      // If last frame of chunk, increase estimatedFrameBSTPointer
-      if (offset == frameCount - 1) {
-        this.estimatedFrameBSTPointer += 1;
-      }
-
-      return this.chunkBoxesIndex[chunkId].getBoxes(offset);
+    if (result != null) {
+      return result
     }
 
-    // Binary search in BST for frameOffset. Should only be used when reloading or forced transition
-    let min = 0;
-    let max = this.frameBST.length;
+    // Binary search in BST for frameOffset. Should only be used when reloading or a forced transition
+    let min = 0
+    let max = this.chunkBST.length
 
     while (min <= max) {
-      let mid = Math.floor((max + min) / 2);
-      
-      let [midFrameOffset, chunkId] = frameBST[mid];
+      const mid = Math.floor((max + min) / 2)
+
+      const [midFrameOffset, chunkId] = this.chunkBST[mid]
 
       if (midFrameOffset < frameOffset) {
-        min = midFrameOffset + 1;
+        min = midFrameOffset + 1
       } else if (midFrameOffset > frameOffset) {
-        max = midFrameOffset - 1;
+        max = midFrameOffset - 1
       } else {
-        this.estimatedFrameBSTPointer = midFrameOffset;
-        return this.chunkBoxesIndex[chunkId].getBoxes(0);
+        this.pointer = midFrameOffset
+        return this.analysisIndex[chunkId].getBoxes(0)
       }
     }
 
-    [chunkOffset, chunkId] = frameBST[max];
-
-    frameCount = this.videoChunkIndex[chunkId].frameCount;
-    this.estimatedFrameBSTPointer = max;
-    
-    if (offset == frameCount - 1) {
-      this.estimatedFrameBSTPointer += 1;
-    }
-
-    // Substract chunkOffset to normalize offset for chunk
-    offset = frameOffset - chunkOffset;
-    return this.chunkBoxesIndex[chunkId].getBoxes(offset);
+    // Use max because we want the closest smallest possible
+    return this.getBoxesFromChunkBST(frameOffset, max)
   }
 
+  getBoxesFromChunkBST (frameOffset, index) {
+    const [chunkOffset, chunkId] = this.chunkBST[index]
+
+    const frameCount = this.chunkIndex[chunkId].frameCount
+    // Subtract chunkOffset to normalize offset for chunk
+    const offset = frameOffset - chunkOffset
+    this.pointer = index
+
+    if (offset >= 0 && offset < frameCount) {
+      if (offset === frameCount - 1) {
+        this.pointer += 1
+      }
+
+      return this.analysisIndex[chunkId].getBoxes(offset)
+    } else {
+      return null
+    }
+  }
 }
