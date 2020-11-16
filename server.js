@@ -1,6 +1,5 @@
-var server = require('./app')
-var configuration = require('./app/configuration')
-
+const server = require('./app')
+const configuration = require('./app/configuration')
 
 const port = configuration.server.port
 

@@ -21,15 +21,15 @@ app.use(bodyParser.json())
 const socketServer = new SocketServer(server)
 
 // Video endpoint
-app.post('/video/chunk', (req, res) => {
-  socketServer.sendChunk(new VideoChunk(req.body))
+app.post('/video/chunk/:id', (req, res) => {
+  socketServer.sendVideoChunk(new VideoChunk(req.params.id))
 
   res.status(200).send('OK')
 })
 
 // Analysis endpoint
-app.post('/video/analysis', (req, res) => {
-  socketServer.sendAnalysis(new VideoAnalysis(req.body))
+app.post('/video/analysis/:id', (req, res) => {
+  socketServer.sendVideoAnalysis(new VideoAnalysis(req.params.id))
 
   res.status(200).send('OK')
 })

@@ -2,23 +2,22 @@ const fetchVideo = require('./fetch_video')
 const pgClient = require('./pg_client')
 
 const metadataQuery = `
-  SELECT frame_count as frameCount, duration, timestamp 
-  FROM video_chunks 
+  SELECT frame_count, duration_ms, timestamp 
+  FROM video_chunk
   WHERE id = $1;
 `
 
 class Chunk {
-  constructor (request) {
-    this.id = request.id
-    this.payloadPromise = fetchVideo(this.id)
-    this.metadataPromise = pgClient.query(metadataQuery, [this.id]).then((res) => {
+  constructor (id) {
+    this.payloadPromise = fetchVideo(id)
+    this.metadataPromise = pgClient.query(metadataQuery, [id]).then((res) => {
       return new Promise((resolve, reject) => {
         const result = res.rows[0]
 
         resolve({
-          id: request.id,
-          frameCount: result.frameCount,
-          duration: result.duration,
+          id: id,
+          frameCount: result.frame_count,
+          duration: result.duration_ms,
           timestamp: result.timestamp
         })
       })
