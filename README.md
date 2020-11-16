@@ -1,6 +1,6 @@
 # big-fiubrother-web
 
-Big Fiubrother web server and client
+Big Fiubrother web server and client.
 
 # Install
 

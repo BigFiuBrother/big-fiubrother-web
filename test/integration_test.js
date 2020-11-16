@@ -83,6 +83,7 @@ socketClient.on("chunk", (chunk) => {
   assert(chunk.frameCount === 119)
   assert(chunk.duration === 4959)
   assert(chunk.timestamp === 1)
+  assert(chunk.payload.length === 1791908)
   console.log(`Assertions successful for video chunk ${chunk.id}`)
 })
 

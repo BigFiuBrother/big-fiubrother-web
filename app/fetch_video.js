@@ -33,7 +33,7 @@ function onError (videoChunkId, err) {
 }
 
 function fetchVideo (videoChunkId) {
-  const promise = minioClient.getObject('processed-video-chunks', `${videoChunkId}.mp4`)
+  const promise = minioClient.getObject('video-chunks', `${videoChunkId}.mp4`)
 
   return promise.then(onSuccess.bind(null, videoChunkId), onError.bind(null, videoChunkId))
 }

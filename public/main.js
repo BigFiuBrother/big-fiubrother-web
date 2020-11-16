@@ -1,7 +1,7 @@
-import { SocketClient } from './socket_client'
-import { VideoIndex } from './video_index'
-import { VideoCanvas } from './video_canvas'
-import { VideoBuffer } from './video_buffer'
+import { SocketClient } from './modules/socket_client.js'
+import { VideoIndex } from './modules/video_index.js'
+import { VideoCanvas } from './modules/video_canvas.js'
+import { VideoBuffer } from './modules/video_buffer.js'
 
 const socketClient = new SocketClient()
 const videoIndex = new VideoIndex()
@@ -13,7 +13,7 @@ const mime = 'video/mp4; codecs="avc1.f4001f"'
 // eslint-disable-next-line no-undef
 const mediaSource = new MediaSource()
 
-const video = document.getElementById('video')
+const video = document.getElementById('auxiliary-video')
 video.src = URL.createObjectURL(mediaSource)
 
 mediaSource.addEventListener('sourceopen', (e) => {

@@ -1,8 +1,7 @@
-import io from 'socket.io-client'
-
 export class SocketClient {
   constructor () {
     this.client = io.connect('http://localhost:8080/video', { forceNew: true })
+    console.log("Connected to web server!")
   }
 
   onChunk (callback) {

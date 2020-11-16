@@ -1,4 +1,7 @@
-import { PriorityQueue } from './priority_queue.min'
+import { PriorityQueue } from './priority_queue.js'
+
+// Time to pre-buffer
+const PRE_BUFFER_SIZE = 1.0
 
 export class VideoBuffer {
   constructor (sourceBuffer, videoIndex) {
@@ -30,9 +33,8 @@ export class VideoBuffer {
     })
   }
 
-  // Needs to prebuffer if time in queue is less than 5 seconds
   needsToPreBuffer () {
-    return this.preBuffering < 5.0
+    return this.preBuffering < PRE_BUFFER_SIZE
   }
 
   getTimeAppended () {

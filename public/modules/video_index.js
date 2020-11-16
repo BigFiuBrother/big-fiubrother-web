@@ -1,4 +1,4 @@
-import { VideoAnalysis } from './video_analysis'
+import { VideoAnalysis } from './video_analysis.js'
 
 export class VideoIndex {
   constructor () {

@@ -3,7 +3,7 @@ export class VideoCanvas {
     this.videoIndex = videoIndex
     this.frameOffset = 0
 
-    const video = document.getElementById('video')
+    const video = document.getElementById('auxiliary-video')
 
     this.canvas = document.getElementById('video-canvas')
     const ctx = this.canvas.getContext('2d')
