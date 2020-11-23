@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "args-parser": "^1.1.0",
+    "axios": "^0.21.0",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "graylog2": "^0.2.1",

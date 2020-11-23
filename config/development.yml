@@ -16,3 +16,7 @@ db:
   database: 'big_fiubrother'
   password: 'alwayswatching'
   port: 5432
+metadata:
+  video:
+    width: 1280
+    height: 720

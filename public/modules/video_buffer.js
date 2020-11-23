@@ -50,13 +50,13 @@ export class VideoBuffer {
 
     do {
       chunk = this.queue.pop()
-      this.preBuffering -= chunk.duration
+      this.preBuffering -= chunk.duration / 1000
       // Remove chunks that have a timestamp before the last appended until queue is emptied
     } while (chunk.timestamp < this.lastTimestamp && !this.queue.isEmpty())
 
     if (chunk.timestamp > this.lastTimestamp) {
       this.lastTimestamp = chunk.timestamp
-      this.timeAppended += chunk.duration
+      this.timeAppended += chunk.duration / 1000
       this.lastChunk = chunk
       this.videoIndex.addVideoChunk(chunk)
       this.sourceBuffer.appendBuffer(chunk.payload)
@@ -66,7 +66,7 @@ export class VideoBuffer {
   preBufferChunk (chunk) {
     let appended = false
 
-    this.preBuffering += chunk.duration
+    this.preBuffering += chunk.duration / 1000
     this.queue.push(chunk)
 
     if (!this.sourceBuffer.updating && !this.needsToPreBuffer()) {

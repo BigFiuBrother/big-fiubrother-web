@@ -38,10 +38,9 @@ export class PriorityQueue {
       this._swap(top, d)
       this._heap.pop()
       this._siftDown()
-      return c
-    } else {
-      return null
     }
+
+    return c
   }
 
   replace(c) {
@@ -77,7 +76,7 @@ export class PriorityQueue {
       }
 
       this._swap(c, d)
-      
+
       c = d
     }
   }

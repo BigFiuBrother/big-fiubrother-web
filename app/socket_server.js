@@ -1,11 +1,13 @@
 const logger = require('./logger')
+const configuration  = require('./configuration')
 
 class SocketServer {
   constructor (server) {
     this.io = require('socket.io')(server)
 
-    this.io.of('/video').on('connection', function () {
+    this.io.of('/video').on('connection', function (socket) {
       logger.info('New client connected!')
+      socket.emit('metadata', configuration.metadata)
     })
   }
 
