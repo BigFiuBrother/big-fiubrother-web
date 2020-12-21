@@ -42,6 +42,7 @@ window.addEventListener('load', () => {
       if (hasSwitchedTabs) {
         hasSwitchedTabs = false
         const lastChunk = videoBuffer.getLastChunk()
+        // TODO: Check time difference to force canvas update. Maybe 10 seconds diff?
         if (lastChunk != null) {
           video.currentTime = videoBuffer.getTimeAppended() - lastChunk.duration
           videoCanvas.updateToChunk(lastChunk.id)

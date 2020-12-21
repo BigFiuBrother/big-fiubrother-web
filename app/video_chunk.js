@@ -9,6 +9,7 @@ const metadataQuery = `
 
 class Chunk {
   constructor (id) {
+    this.id = id
     this.payloadPromise = fetchVideo(id)
     this.metadataPromise = pgClient.query(metadataQuery, [id]).then((res) => {
       return new Promise((resolve, reject) => {
